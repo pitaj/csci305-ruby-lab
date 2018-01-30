@@ -20,6 +20,25 @@ def cleanup_title(line)
 	title = title.gsub(/[\?¿!¡\.;&@%#\|\n]/, "")
 	# lowercase title
 	title = title.downcase
+	# filter out common stop words
+	title = title.split(' ').select { |item| ![
+		'a',
+		'an',
+		'and',
+		"by",
+		"for",
+		"from",
+		"in",
+		"of",
+		"on",
+		"or",
+		"out",
+		"the",
+		"to",
+		"with",
+].include? item }
+
+	title.join(' ')
 end
 
 $bigrams = Hash.new # The Bigram data structure
