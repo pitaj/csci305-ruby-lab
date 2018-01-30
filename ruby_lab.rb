@@ -125,6 +125,18 @@ def mcw(previous, offset = 0)
 	end
 end
 
+# returns an approximately gaussian random number between 0 and 1
+# based on a stackoverflow answer
+def gaussianRand
+  x = 0
+
+  (1..3).each do
+    x += rand
+	end
+
+  x / 3
+end
+
 # create a title 20 words long or less
 # based on the most likely word pairs
 
@@ -140,15 +152,17 @@ def create_title(word)
 		sentence << word
 		counts[word] += 1
 
-		last = word
-		word = mcw word
+		prev = word
+		word = mcw prev
 
-		# only allow two occurences of the same word
-		i = 0
-		while counts[word] >= 2
-			i += 1
-			word = mcw(last, i)
-		end
+		# as a word is used more, shift the center of the distribution
+		# also scale the distribution more as more repetition occurs
+		# by default, it is centered on the border of items 0 and 1
+		count = counts[word]
+
+		offset = count + 0.4 + gaussianRand * (count + 1)
+
+		word = mcw(prev, offset.floor)
 	end
 
 	sentence.join(' ')
