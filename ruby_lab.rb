@@ -136,7 +136,27 @@ def main_loop()
 	# process the file
 	process_file(ARGV[0])
 
+	puts create_title "happy"
+
+	puts "Generate a song title based on the first word"
 	# Get user input
+	while true do
+		print "Enter a word [Enter 'q' to quit]: "
+
+		# need stdio because otherwise it uses the file as input
+		input = $stdin.gets.strip
+
+		if input.downcase == 'q'
+			exit 0
+		end
+
+		if input == ''
+			puts "Emptiness won't work"
+		else
+			title = create_title(input)
+			puts title
+		end
+	end
 end
 
 if __FILE__==$0
