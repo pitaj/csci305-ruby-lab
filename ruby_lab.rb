@@ -112,32 +112,43 @@ def process_file(file_name)
 end
 
 # get most common word after the given previous word
-def mcw(previous)
+# offset is a number of words to ignore as the most common
+def mcw(previous, offset = 0)
 	subhash = $bigrams[previous]
 
 	if subhash
-		most = 0
-		mostWord = nil
+		keys = subhash.keys
 
-		subhash.each do |after, count|
-			if count > most
-				most = count
-				mostWord = after
-			end
-		end
+		keys.sort! { |a, b| subhash[b] - subhash[a] }
 
-		mostWord
+		keys[offset]
 	end
 end
 
 # create a title 20 words long or less
 # based on the most likely word pairs
+
+# this is deterministic, might try adding some randomness
 def create_title(word)
 	sentence = []
 
+	# track word counts to avoid repetition
+	counts = Hash.new
+	counts.default = 0
+
 	while word && sentence.length <= 20 do
 		sentence << word
+		counts[word] += 1
+
+		last = word
 		word = mcw word
+
+		# only allow two occurences of the same word
+		i = 0
+		while counts[word] >= 2
+			i += 1
+			word = mcw(last, i)
+		end
 	end
 
 	sentence.join(' ')
@@ -155,8 +166,7 @@ def main_loop()
 	# process the file
 	process_file(ARGV[0])
 
-	puts create_title "happy"
-
+	puts
 	puts "Generate a song title based on the first word"
 	# Get user input
 	while true do
